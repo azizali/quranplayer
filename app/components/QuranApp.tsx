@@ -15,6 +15,7 @@ const QuranApp = () => {
   }, [surahNumber]);
 
   useEffect(() => {
+    setStartingAyatNumber(1);
     setEndingAyatNumber(surah.numberOfAyats);
     setActiveAyatNumber("");
     setIsPlaying(false);
@@ -67,7 +68,7 @@ const QuranApp = () => {
   };
 
   return (
-    <div style={{ width: "500px", margin: "0 auto" }}>
+    <div style={{ width: "100%", maxWidth: "500px", margin: "0 auto" }}>
       <div>
         <label>
           Repeat
