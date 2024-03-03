@@ -107,23 +107,13 @@ const QuranApp = () => {
   }, [currentAyat, surah]);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        maxWidth: "400px",
-        margin: "0 auto",
-        padding: "10px",
-        justifyContent: "space-between",
-      }}
-    >
+    <div className="flex rounded-lg border-2 mx-auto p-9 w-full max-w-md flex-col justify-center gap-3 bg-white">
       <div style={{ display: "flex", justifyContent: "center" }}>
         <h1 style={{ fontSize: "1.5em", margin: 0, padding: 0 }}>
           Quran Hifz Helper
         </h1>
       </div>
-      <div style={{ flexGrow: 1 }}>
+      <div>
         {/* <div
           style={{ width: "100%", overflowY: "scroll" }}
           id="surah"
@@ -140,7 +130,7 @@ const QuranApp = () => {
           ))}
         </div> */}
         <select
-          style={{ width: "100%" }}
+          className="border-2 rounded p-2 w-full"
           name="surah"
           id="surah"
           value={surahNumber}
@@ -156,15 +146,11 @@ const QuranApp = () => {
           ))}
         </select>
       </div>
-      <div
-        style={{
-          display: "flex",
-          gap: "10px",
-        }}
-      >
-        <div style={{ display: "flex", gap: "10px" }}>
-          <label htmlFor="startAyat">Starting Ayat</label>
+      <div className="flex gap-2 justify-between">
+        <div className="flex gap-2 items-center">
+          <label htmlFor="startAyat">Starting</label>
           <select
+            className="border-2 rounded p-2"
             name="startingAyatNumber"
             id="startingAyatNumber"
             value={startingAyatNumber}
@@ -179,9 +165,10 @@ const QuranApp = () => {
             ))}
           </select>
         </div>
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div className="flex gap-2 items-center">
           <label htmlFor="startAyat">Ending Ayat</label>
           <select
+            className="border-2 rounded p-2"
             name="endingAyatNumber"
             id="endingAyatNumber"
             value={endingAyatNumber}
@@ -233,12 +220,20 @@ const QuranApp = () => {
       Current Ayat: {currentAyat}
       <div>
         {!isPlaying && (
-          <button style={{ width: "100%" }} onClick={handlePlay}>
+          <button
+            className="rounded bg-indigo-600 px-2 py-1 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            style={{ width: "100%" }}
+            onClick={handlePlay}
+          >
             Play
           </button>
         )}
         {isPlaying && (
-          <button style={{ width: "100%" }} onClick={handlePause}>
+          <button
+            className="rounded bg-indigo-600 px-2 py-1 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            style={{ width: "100%" }}
+            onClick={handlePause}
+          >
             Pause
           </button>
         )}
