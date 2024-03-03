@@ -1,10 +1,18 @@
-import { createRef, useEffect, useMemo, useRef, useState } from "react";
+import {
+  createRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { surahs } from "~/components/config";
 
 const QuranApp = () => {
-  const audioPlayerRef = useRef<any[]>([]);
+  const audioPlayerRef = useRef<any>({});
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [activeAyatNumber, setActiveAyatNumber] = useState<string>("");
+  const [activeTrack, setActiveTrack] = useState<string>("");
+
   const [surahNumber, setSurahNumber] = useState<number>(1);
   const [startingAyatNumber, setStartingAyatNumber] = useState<number>(1);
   const [endingAyatNumber, setEndingAyatNumber] = useState<number>(1);
@@ -14,58 +22,81 @@ const QuranApp = () => {
     return surahs[surahNumber - 1];
   }, [surahNumber]);
 
-  useEffect(() => {
-    setStartingAyatNumber(1);
-    setEndingAyatNumber(surah.numberOfAyats);
-    setActiveAyatNumber("");
-    setIsPlaying(false);
-  }, [surah]);
-
-  const tracksToPlay = useMemo(() => {
+  const ayatRangeToPlay = useMemo(() => {
     let ayatNumber = startingAyatNumber - 1;
 
     return Array.from({
       length: endingAyatNumber - ayatNumber,
-    }).map((_, index) => {
-      audioPlayerRef.current[index] = createRef();
+    }).map(() => {
       ayatNumber++;
-      return `${surahNumber.toString().padStart(3, "0")}${ayatNumber
+
+      const track: string = `${surahNumber
         .toString()
-        .padStart(3, "0")}`;
+        .padStart(3, "0")}${ayatNumber.toString().padStart(3, "0")}`;
+      audioPlayerRef.current[track] = createRef();
+
+      return {
+        surahNumber,
+        ayatNumber,
+        track,
+      };
     });
   }, [surahNumber, startingAyatNumber, endingAyatNumber]);
 
   const handleEnded = (e) => {
     const currentTrack = e.target.id;
-    const trackIndex = tracksToPlay.indexOf(currentTrack);
-    const nextTrack = tracksToPlay[trackIndex + 1];
+    const trackIndex = ayatRangeToPlay.findIndex(
+      ({ track }) => track === currentTrack
+    );
+    const nextTrack = ayatRangeToPlay[trackIndex + 1]?.track;
 
     if (nextTrack) {
-      audioPlayerRef.current[trackIndex + 1].current.play();
-      setActiveAyatNumber(nextTrack);
+      audioPlayerRef.current[nextTrack].current.play();
+      setActiveTrack(nextTrack);
       return;
     }
     if (shouldRepeat) {
-      audioPlayerRef.current[0].current.play();
-      setActiveAyatNumber(tracksToPlay[0]);
+      const firstTrack = ayatRangeToPlay[0].track;
+      audioPlayerRef.current[firstTrack].current.play();
+      setActiveTrack(firstTrack);
       return;
     }
     setIsPlaying(false);
   };
 
-  const handlePlayPause = (e) => {
-    setActiveAyatNumber(tracksToPlay[0]);
-    const activeTrackIndex = 0;
-
-    if (!isPlaying) {
-      audioPlayerRef.current[activeTrackIndex].current.play();
-      setIsPlaying(true);
-      return;
-    }
-
-    audioPlayerRef.current[activeTrackIndex].current.pause();
-    setIsPlaying(false);
+  const handlePlay = (e) => {
+    e.preventDefault();
+    setIsPlaying(true);
+    audioPlayerRef.current[activeTrack].current.play();
   };
+
+  const handlePause = (e) => {
+    e.preventDefault();
+    setIsPlaying(false);
+    audioPlayerRef.current[activeTrack].current.pause();
+  };
+
+  const handleStopAll = useCallback(() => {
+    setIsPlaying(false);
+    const tracks = Object.keys(audioPlayerRef.current);
+    tracks.forEach((track) => {
+      const elm = audioPlayerRef.current[track]?.current;
+      if (!elm) return;
+      elm.pause();
+      elm.currentTime = 0;
+    });
+  }, []);
+
+  useEffect(() => {
+    setStartingAyatNumber(1);
+    setEndingAyatNumber(surah.numberOfAyats);
+  }, [surah]);
+
+  useEffect(() => {
+    if (!ayatRangeToPlay.length) return;
+    handleStopAll();
+    setActiveTrack(ayatRangeToPlay[0].track);
+  }, [ayatRangeToPlay, handleStopAll]);
 
   return (
     <div
@@ -73,7 +104,6 @@ const QuranApp = () => {
         display: "flex",
         flexDirection: "column",
         width: "100%",
-        height: "100vh",
         maxWidth: "400px",
         margin: "0 auto",
         padding: "10px",
@@ -132,8 +162,6 @@ const QuranApp = () => {
             value={startingAyatNumber}
             onChange={(e) => {
               setStartingAyatNumber(parseInt(e.target.value));
-              setActiveAyatNumber("");
-              setIsPlaying(false);
             }}
           >
             {Array.from({ length: surah.numberOfAyats }).map((_, index) => (
@@ -151,8 +179,6 @@ const QuranApp = () => {
             value={endingAyatNumber}
             onChange={(e) => {
               setEndingAyatNumber(parseInt(e.target.value));
-              setActiveAyatNumber("");
-              setIsPlaying(false);
             }}
           >
             {Array.from({
@@ -168,29 +194,24 @@ const QuranApp = () => {
           </select>
         </div>
       </div>
-
       <div>
-        {activeAyatNumber && (
-          <>
-            Playing Ayat:{" "}
-            {parseInt(activeAyatNumber.split("").splice(3).join(""))}
-          </>
-        )}
-        {tracksToPlay.map((track, index) => {
+        {ayatRangeToPlay.map(({ track }) => {
           return (
             <audio
               key={track}
               id={track}
-              ref={audioPlayerRef.current[index]}
+              ref={audioPlayerRef.current[track]}
               preload="true"
-              controls={activeAyatNumber === track}
+              // controls
+              controls={activeTrack === track}
               onEnded={handleEnded}
+              onPlay={handlePlay}
+              onPause={handlePause}
               src={`https://mirrors.quranicaudio.com/muqri/alafasi/opus/${track}.opus`}
             ></audio>
           );
         })}
       </div>
-
       <div>
         <label htmlFor="shouldRepeat">Repeat</label>
         <input
@@ -201,11 +222,18 @@ const QuranApp = () => {
           onChange={() => setShouldRepeat(!shouldRepeat)}
         />
       </div>
-
+      Current Ayat: {parseInt(activeTrack.split("").slice(3).join(""))}
       <div>
-        <button style={{ width: "100%" }} onClick={handlePlayPause}>
-          Play
-        </button>
+        {!isPlaying && (
+          <button style={{ width: "100%" }} onClick={handlePlay}>
+            Play
+          </button>
+        )}
+        {isPlaying && (
+          <button style={{ width: "100%" }} onClick={handlePause}>
+            Pause
+          </button>
+        )}
       </div>
     </div>
   );

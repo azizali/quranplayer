@@ -1,8 +1,11 @@
 # TODO:
 
-- DARK MODE
-- Tracks in title
-- Overwrite play
+- [x] Overwrite play
+- [ ] Tick sound on repeat
+- [ ] Tracks in title
+- [ ] Design
+- [ ] Save prefence in localstorage
+- [ ] DARK MODE
 
 # Welcome to Remix!
 

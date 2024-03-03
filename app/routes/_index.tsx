@@ -3,8 +3,8 @@ import QuranApp from "~/components/QuranApp";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "Quran Audio Player" },
-    { name: "description", content: "Quran Audio Player" },
+    { title: "Quran Hifz Helper" },
+    { name: "description", content: "Quran Hifz Helper" },
   ];
 };
 
