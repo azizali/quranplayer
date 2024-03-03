@@ -43,6 +43,10 @@ const QuranApp = () => {
     });
   }, [surahNumber, startingAyatNumber, endingAyatNumber]);
 
+  const currentAyat = useMemo(() => {
+    return parseInt(activeTrack.split("").slice(3).join(""));
+  }, [activeTrack]);
+
   const handleEnded = (e) => {
     const currentTrack = e.target.id;
     const trackIndex = ayatRangeToPlay.findIndex(
@@ -97,6 +101,10 @@ const QuranApp = () => {
     handleStopAll();
     setActiveTrack(ayatRangeToPlay[0].track);
   }, [ayatRangeToPlay, handleStopAll]);
+
+  useEffect(() => {
+    document.title = `${surah.number}:${currentAyat} : ${surah.name} - Quran Hifz Helper`;
+  }, [currentAyat, surah]);
 
   return (
     <div
@@ -222,7 +230,7 @@ const QuranApp = () => {
           onChange={() => setShouldRepeat(!shouldRepeat)}
         />
       </div>
-      Current Ayat: {parseInt(activeTrack.split("").slice(3).join(""))}
+      Current Ayat: {currentAyat}
       <div>
         {!isPlaying && (
           <button style={{ width: "100%" }} onClick={handlePlay}>
