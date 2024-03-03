@@ -1,3 +1,9 @@
+# TODO:
+
+- DARK MODE
+- Tracks in title
+- Overwrite play
+
 # Welcome to Remix!
 
 - [Remix Docs](https://remix.run/docs)

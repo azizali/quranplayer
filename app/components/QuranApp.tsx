@@ -68,32 +68,42 @@ const QuranApp = () => {
   };
 
   return (
-    <div style={{ width: "100%", maxWidth: "500px", margin: "0 auto" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        height: "100vh",
+        maxWidth: "400px",
+        margin: "0 auto",
+        padding: "10px",
+        justifyContent: "space-between",
+      }}
+    >
       <div>
-        <label>
-          Repeat
-          <input
-            type="checkbox"
-            name="shouldRepeat"
-            id="shouldRepeat"
-            checked={shouldRepeat}
-            onChange={(e) => setShouldRepeat(!shouldRepeat)}
-          />
-        </label>
+        <label htmlFor="shouldRepeat">Repeat</label>
+        <input
+          type="checkbox"
+          name="shouldRepeat"
+          id="shouldRepeat"
+          checked={shouldRepeat}
+          onChange={() => setShouldRepeat(!shouldRepeat)}
+        />
       </div>
-      <div style={{ display: "flex", gap: "10px" }}>
-        <label htmlFor="surah">Surah</label>
+      <div style={{ flexGrow: 1 }}>
         <select
+          style={{ width: "100%", height: "100%" }}
           name="surah"
           id="surah"
           value={surahNumber}
+          size={20}
           onChange={(e) => {
-            setSurahNumber(e.target.value);
+            setSurahNumber(parseInt(e.target.value));
           }}
         >
-          {surahs.map(({ number, name, nameEnglish, numberOfAyats }) => (
+          {surahs.map(({ number, name, nameEnglish }) => (
             <option key={name} value={number}>
-              {number} - {name}: {nameEnglish} ({numberOfAyats} Ayats)
+              {number}. {name}: {nameEnglish}
             </option>
           ))}
         </select>
@@ -148,11 +158,7 @@ const QuranApp = () => {
           </select>
         </div>
       </div>
-      <div>
-        <button style={{ width: "100%" }} onClick={handlePlayPause}>
-          Play
-        </button>
-      </div>
+
       <div>
         {activeAyatNumber && (
           <>
@@ -162,19 +168,22 @@ const QuranApp = () => {
         )}
         {tracksToPlay.map((track, index) => {
           return (
-            <>
-              <audio
-                key={track}
-                id={track}
-                ref={audioPlayerRef.current[index]}
-                preload="true"
-                controls={activeAyatNumber === track}
-                onEnded={handleEnded}
-                src={`https://mirrors.quranicaudio.com/muqri/alafasi/opus/${track}.opus`}
-              ></audio>
-            </>
+            <audio
+              key={track}
+              id={track}
+              ref={audioPlayerRef.current[index]}
+              preload="true"
+              controls={activeAyatNumber === track}
+              onEnded={handleEnded}
+              src={`https://mirrors.quranicaudio.com/muqri/alafasi/opus/${track}.opus`}
+            ></audio>
           );
         })}
+      </div>
+      <div>
+        <button style={{ width: "100%" }} onClick={handlePlayPause}>
+          Play
+        </button>
       </div>
     </div>
   );
