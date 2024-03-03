@@ -80,23 +80,33 @@ const QuranApp = () => {
         justifyContent: "space-between",
       }}
     >
-      <div>
-        <label htmlFor="shouldRepeat">Repeat</label>
-        <input
-          type="checkbox"
-          name="shouldRepeat"
-          id="shouldRepeat"
-          checked={shouldRepeat}
-          onChange={() => setShouldRepeat(!shouldRepeat)}
-        />
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <h1 style={{ fontSize: "1.5em", margin: 0, padding: 0 }}>
+          Quran Hifz Helper
+        </h1>
       </div>
       <div style={{ flexGrow: 1 }}>
+        {/* <div
+          style={{ width: "100%", overflowY: "scroll" }}
+          id="surah"
+          value={surahNumber}
+          size={1}
+          onChange={(e) => {
+            setSurahNumber(parseInt(e.target.value));
+          }}
+        >
+          {surahs.map(({ number, name, nameEnglish }) => (
+            <div key={name} value={number}>
+              {number}. {name}: {nameEnglish}
+            </div>
+          ))}
+        </div> */}
         <select
-          style={{ width: "100%", height: "100%" }}
+          style={{ width: "100%" }}
           name="surah"
           id="surah"
           value={surahNumber}
-          size={20}
+          size={1}
           onChange={(e) => {
             setSurahNumber(parseInt(e.target.value));
           }}
@@ -180,6 +190,18 @@ const QuranApp = () => {
           );
         })}
       </div>
+
+      <div>
+        <label htmlFor="shouldRepeat">Repeat</label>
+        <input
+          type="checkbox"
+          name="shouldRepeat"
+          id="shouldRepeat"
+          checked={shouldRepeat}
+          onChange={() => setShouldRepeat(!shouldRepeat)}
+        />
+      </div>
+
       <div>
         <button style={{ width: "100%" }} onClick={handlePlayPause}>
           Play
