@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { surahs } from "~/components/config";
+import { appName, surahs } from "~/components/config";
 
 const QuranApp = () => {
   const audioPlayerRef = useRef<any>({});
@@ -68,16 +68,25 @@ const QuranApp = () => {
     setIsPlaying(false);
   };
 
-  const handlePlay = (e) => {
-    e.preventDefault();
+  const handlePlay = ({ activeTrack }) => {
     setIsPlaying(true);
-    audioPlayerRef.current[activeTrack].current.play();
+    try {
+      audioPlayerRef.current[activeTrack].current?.play();
+    } catch (e) {
+      console.log(e);
+    }
   };
 
-  const handlePause = (e) => {
-    e.preventDefault();
+  const handlePause = () => {
     setIsPlaying(false);
     audioPlayerRef.current[activeTrack].current.pause();
+  };
+
+  const handleReset = () => {
+    handleStopAll();
+    const firstTrack = ayatRangeToPlay[0].track;
+    setActiveTrack(firstTrack);
+    handlePlay({ activeTrack: firstTrack });
   };
 
   const handleStopAll = useCallback(() => {
@@ -103,32 +112,24 @@ const QuranApp = () => {
   }, [ayatRangeToPlay, handleStopAll]);
 
   useEffect(() => {
-    document.title = `${surah.number}:${currentAyat} : ${surah.name} - Quran Hifz Helper`;
+    document.title = `${surah.number}:${currentAyat} : ${surah.name} - ${appName}`;
   }, [currentAyat, surah]);
 
   return (
     <div className="flex rounded-lg border-2 mx-auto p-9 w-full max-w-md flex-col justify-center gap-3 bg-white">
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <h1 style={{ fontSize: "1.5em", margin: 0, padding: 0 }}>
-          Quran Hifz Helper
+        <h1
+          style={{
+            fontSize: "1.5em",
+            margin: 0,
+            padding: 0,
+            fontWeight: "bold",
+          }}
+        >
+          {appName}
         </h1>
       </div>
       <div>
-        {/* <div
-          style={{ width: "100%", overflowY: "scroll" }}
-          id="surah"
-          value={surahNumber}
-          size={1}
-          onChange={(e) => {
-            setSurahNumber(parseInt(e.target.value));
-          }}
-        >
-          {surahs.map(({ number, name, nameEnglish }) => (
-            <div key={name} value={number}>
-              {number}. {name}: {nameEnglish}
-            </div>
-          ))}
-        </div> */}
         <select
           className="border-2 rounded p-2 w-full"
           name="surah"
@@ -146,7 +147,7 @@ const QuranApp = () => {
           ))}
         </select>
       </div>
-      <div className="flex gap-2 justify-between">
+      <div className="flex gap-2">
         <div className="flex gap-2 items-center">
           <label htmlFor="startAyat">Starting</label>
           <select
@@ -166,7 +167,7 @@ const QuranApp = () => {
           </select>
         </div>
         <div className="flex gap-2 items-center">
-          <label htmlFor="startAyat">Ending Ayat</label>
+          <label htmlFor="startAyat">Ending</label>
           <select
             className="border-2 rounded p-2"
             name="endingAyatNumber"
@@ -197,44 +198,59 @@ const QuranApp = () => {
               id={track}
               ref={audioPlayerRef.current[track]}
               preload="true"
-              // controls
               controls={activeTrack === track}
               onEnded={handleEnded}
-              onPlay={handlePlay}
-              onPause={handlePause}
-              src={`https://mirrors.quranicaudio.com/muqri/alafasi/opus/${track}.opus`}
-            ></audio>
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+            >
+              <source
+                src={`https://mirrors.quranicaudio.com/muqri/alafasi/opus/${track}.opus`}
+              />
+              <track
+                src={`https://mirrors.quranicaudio.com/muqri/alafasi/opus/${track}.opus`}
+                kind="captions"
+                srcLang="en"
+                label="English"
+              />
+            </audio>
           );
         })}
       </div>
       <div>
-        <label htmlFor="shouldRepeat">Repeat</label>
-        <input
-          type="checkbox"
-          name="shouldRepeat"
-          id="shouldRepeat"
-          checked={shouldRepeat}
-          onChange={() => setShouldRepeat(!shouldRepeat)}
-        />
+        <label className="flex gap-2" htmlFor="shouldRepeat">
+          <input
+            type="checkbox"
+            name="shouldRepeat"
+            id="shouldRepeat"
+            checked={shouldRepeat}
+            onChange={() => setShouldRepeat(!shouldRepeat)}
+          />
+          Repeat
+        </label>
       </div>
       Current Ayat: {currentAyat}
-      <div>
+      <div className="flex gap-2">
         {!isPlaying && (
           <button
-            className="rounded bg-indigo-600 px-2 py-1 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            className="btn"
             style={{ width: "100%" }}
-            onClick={handlePlay}
+            onClick={() => handlePlay({ activeTrack })}
           >
             Play
           </button>
         )}
         {isPlaying && (
           <button
-            className="rounded bg-indigo-600 px-2 py-1 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            className="btn"
             style={{ width: "100%" }}
             onClick={handlePause}
           >
             Pause
+          </button>
+        )}
+        {currentAyat > 1 && (
+          <button className="btn-secondary" onClick={handleReset}>
+            Restart
           </button>
         )}
       </div>

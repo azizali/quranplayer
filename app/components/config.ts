@@ -1,3 +1,4 @@
+export const appName = "Hifz Helper";
 export const surahs = [
   {
     number: 1,

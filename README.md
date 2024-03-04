@@ -1,10 +1,16 @@
 # TODO:
 
 - [x] Overwrite play
+- [x] Tracks in title
+- [x] Design
+- [x] Design 2
 - [ ] Tick sound on repeat
-- [ ] Tracks in title
-- [ ] Design
+- [x] Seeking error
+- [x] re-Start from start
 - [ ] Save prefence in localstorage
+- [ ] Backup sound tracks
+- [ ] Bug: Safari not working
+- [ ] Install app
 - [ ] DARK MODE
 
 # Welcome to Remix!

@@ -1,17 +1,14 @@
 import type { MetaFunction } from "@remix-run/deno";
 import QuranApp from "~/components/QuranApp";
+import { appName } from "~/components/config";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "Quran Hifz Helper" },
-    { name: "description", content: "Quran Hifz Helper" },
+    { title: `${appName} Helper` },
+    { name: "description", content: `${appName} Helper` },
   ];
 };
 
 export default function Index() {
-  return (
-    <div className="flex flex-col justify-center h-screen mx-4">
-      <QuranApp />
-    </div>
-  );
+  return <QuranApp />;
 }
