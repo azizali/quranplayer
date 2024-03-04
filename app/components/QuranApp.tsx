@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useLocalStorage } from "usehooks-ts";
 import { appName, surahs } from "~/components/config";
 
 const QuranApp = () => {
@@ -13,10 +14,22 @@ const QuranApp = () => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [activeTrack, setActiveTrack] = useState<string>("");
 
-  const [surahNumber, setSurahNumber] = useState<number>(1);
-  const [startingAyatNumber, setStartingAyatNumber] = useState<number>(1);
-  const [endingAyatNumber, setEndingAyatNumber] = useState<number>(1);
-  const [shouldRepeat, setShouldRepeat] = useState<boolean>(true);
+  const [surahNumber, setSurahNumber] = useLocalStorage<number>(
+    "surahNumber",
+    1
+  );
+  const [startingAyatNumber, setStartingAyatNumber] = useLocalStorage<number>(
+    "startingAyatNumber",
+    1
+  );
+  const [endingAyatNumber, setEndingAyatNumber] = useLocalStorage<number>(
+    "endingAyatNumber",
+    1
+  );
+  const [shouldRepeat, setShouldRepeat] = useLocalStorage<boolean>(
+    "shouldRepeat",
+    true
+  );
 
   const surah = useMemo(() => {
     return surahs[surahNumber - 1];
@@ -101,11 +114,6 @@ const QuranApp = () => {
   }, []);
 
   useEffect(() => {
-    setStartingAyatNumber(1);
-    setEndingAyatNumber(surah.numberOfAyats);
-  }, [surah]);
-
-  useEffect(() => {
     if (!ayatRangeToPlay.length) return;
     handleStopAll();
     setActiveTrack(ayatRangeToPlay[0].track);
@@ -137,7 +145,11 @@ const QuranApp = () => {
           value={surahNumber}
           size={1}
           onChange={(e) => {
-            setSurahNumber(parseInt(e.target.value));
+            const surahNumber = parseInt(e.target.value);
+            setSurahNumber(surahNumber);
+            const surah = surahs[surahNumber - 1];
+            setStartingAyatNumber(1);
+            setEndingAyatNumber(surah.numberOfAyats);
           }}
         >
           {surahs.map(({ number, name, nameEnglish }) => (
@@ -248,7 +260,7 @@ const QuranApp = () => {
             Pause
           </button>
         )}
-        {currentAyat > 1 && (
+        {currentAyat > startingAyatNumber && (
           <button className="btn-secondary" onClick={handleReset}>
             Restart
           </button>

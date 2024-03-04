@@ -7,9 +7,10 @@
 - [ ] Tick sound on repeat
 - [x] Seeking error
 - [x] re-Start from start
-- [ ] Save prefence in localstorage
-- [ ] Backup sound tracks
+- [x] Save prefence in localstorage
+- [ ] Backup sound tracks from server
 - [ ] Bug: Safari not working
+- [ ] Bug: stops in the middle and cant restart again
 - [ ] Install app
 - [ ] DARK MODE
 
