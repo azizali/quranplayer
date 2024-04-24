@@ -1,4 +1,5 @@
 import {
+  RefObject,
   createRef,
   useCallback,
   useEffect,
@@ -9,10 +10,19 @@ import {
 import { useLocalStorage } from "usehooks-ts";
 import { appName, surahs } from "~/components/config";
 
+const audioExtention = "mp3"; // 'opus' | 'mp3'
+const audioSrcBaseUrl = `https://everyayah.com/data/Alafasy_64kbps/`;
+// https://mirrors.quranicaudio.com/muqri/alafasi/opus
+
+type Brand<K, T> = K & { __brand: T };
+type Track = Brand<string, "Track">;
+
 const QuranApp = () => {
-  const audioPlayerRef = useRef<any>({});
+  const audioPlayerRef = useRef<{ [key: Track]: RefObject<HTMLAudioElement> }>(
+    {}
+  );
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [activeTrack, setActiveTrack] = useState<string>("");
+  const [activeTrack, setActiveTrack] = useState<Track>("" as Track);
 
   const [surahNumber, setSurahNumber] = useLocalStorage<number>(
     "surahNumber",
@@ -43,9 +53,10 @@ const QuranApp = () => {
     }).map(() => {
       ayatNumber++;
 
-      const track: string = `${surahNumber
+      const track: Track = `${surahNumber
         .toString()
-        .padStart(3, "0")}${ayatNumber.toString().padStart(3, "0")}`;
+        .padStart(3, "0")}${ayatNumber.toString().padStart(3, "0")}` as Track;
+
       audioPlayerRef.current[track] = createRef();
 
       return {
@@ -81,7 +92,7 @@ const QuranApp = () => {
     setIsPlaying(false);
   };
 
-  const handlePlay = ({ activeTrack }) => {
+  const handlePlay = ({ activeTrack }: { activeTrack: Track }) => {
     setIsPlaying(true);
     try {
       audioPlayerRef.current[activeTrack].current?.play();
@@ -97,7 +108,7 @@ const QuranApp = () => {
 
   const handleReset = () => {
     handleStopAll();
-    const firstTrack = ayatRangeToPlay[0].track;
+    const firstTrack: Track = ayatRangeToPlay[0].track;
     setActiveTrack(firstTrack);
     handlePlay({ activeTrack: firstTrack });
   };
@@ -215,11 +226,9 @@ const QuranApp = () => {
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
             >
-              <source
-                src={`https://mirrors.quranicaudio.com/muqri/alafasi/opus/${track}.opus`}
-              />
+              <source src={`${audioSrcBaseUrl}/${track}.${audioExtention}`} />
               <track
-                src={`https://mirrors.quranicaudio.com/muqri/alafasi/opus/${track}.opus`}
+                src={`${audioSrcBaseUrl}/${track}.${audioExtention}`}
                 kind="captions"
                 srcLang="en"
                 label="English"
