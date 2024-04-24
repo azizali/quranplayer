@@ -266,6 +266,11 @@ const QuranApp = () => {
           </button>
         )}
       </div>
+      {/* {generateAllFileNames().map((link) => (
+        <a key={link} href={link}>
+          {link}
+        </a>
+      ))} */}
     </div>
   );
 };

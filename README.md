@@ -4,15 +4,18 @@
 - [x] Tracks in title
 - [x] Design
 - [x] Design 2
+- [ ] Bug: Safari not working
+- [ ] Get sound file from mp3 source
 - [ ] Tick sound on repeat
 - [x] Seeking error
 - [x] re-Start from start
 - [x] Save prefence in localstorage
 - [ ] Backup sound tracks from server
-- [ ] Bug: Safari not working
 - [ ] Bug: stops in the middle and cant restart again
-- [ ] Install app
-- [ ] DARK MODE
+- [ ] Bug: When start and end track are same number, it does not play
+- [ ] App as PWA + Explore Tinybase
+- [ ] Reciter Selection
+- [ ] Dark mode
 
 # Welcome to Remix!
 

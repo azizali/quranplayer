@@ -685,3 +685,22 @@ export const surahs = [
     numberOfAyats: 6,
   },
 ];
+
+export function generateAllFileNames() {
+  const links: string[] = [];
+
+  surahs.forEach(({ number: surahNumber, numberOfAyats }) => {
+    for (let ayatNumber = 1; ayatNumber < numberOfAyats; ayatNumber++) {
+      const track: string = `${surahNumber
+        .toString()
+        .padStart(3, "0")}${ayatNumber.toString().padStart(3, "0")}`;
+
+      const link = `https://mirrors.quranicaudio.com/muqri/alafasi/opus/${track}.opus`;
+      links.push(link);
+    }
+  });
+
+  return links;
+}
+
+// console.log(generateAllFileNames());
