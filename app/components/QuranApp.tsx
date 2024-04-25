@@ -9,13 +9,11 @@ import {
 } from "react";
 import { useLocalStorage } from "usehooks-ts";
 import { appName, surahs } from "~/components/config";
+import { Track } from "~/routes/types";
 
 const audioExtention = "mp3"; // 'opus' | 'mp3'
 const audioSrcBaseUrl = `https://everyayah.com/data/Alafasy_64kbps/`;
 // https://mirrors.quranicaudio.com/muqri/alafasi/opus
-
-type Brand<K, T> = K & { __brand: T };
-type Track = Brand<string, "Track">;
 
 const QuranApp = () => {
   const audioPlayerRef = useRef<{ [key: Track]: RefObject<HTMLAudioElement> }>(
@@ -45,10 +43,10 @@ const QuranApp = () => {
     return surahs[surahNumber - 1];
   }, [surahNumber]);
 
-  const ayatRangeToPlay = useMemo(() => {
+  const tracksToPlay = useMemo(() => {
     let ayatNumber = startingAyatNumber - 1;
 
-    return Array.from({
+    const trackObjects = Array.from({
       length: endingAyatNumber - ayatNumber,
     }).map(() => {
       ayatNumber++;
@@ -63,20 +61,34 @@ const QuranApp = () => {
         surahNumber,
         ayatNumber,
         track,
+        trackUrl: `${audioSrcBaseUrl}/${track}.${audioExtention}`,
       };
     });
-  }, [surahNumber, startingAyatNumber, endingAyatNumber]);
+
+    if (shouldRepeat) {
+      const REPEAT_SOUND_TRACK = "REPEAT_SOUND_TRACK";
+      trackObjects.push({
+        surahNumber,
+        ayatNumber,
+        track: REPEAT_SOUND_TRACK as Track,
+        trackUrl: "/click-sound.mp3",
+      });
+      audioPlayerRef.current[REPEAT_SOUND_TRACK] = createRef();
+    }
+
+    return trackObjects;
+  }, [startingAyatNumber, endingAyatNumber, shouldRepeat, surahNumber]);
 
   const currentAyat = useMemo(() => {
-    return parseInt(activeTrack.split("").slice(3).join(""));
+    return parseInt(activeTrack.split("").slice(3).join("")) | 0;
   }, [activeTrack]);
 
   const handleEnded = (e) => {
     const currentTrack = e.target.id;
-    const trackIndex = ayatRangeToPlay.findIndex(
+    const trackIndex = tracksToPlay.findIndex(
       ({ track }) => track === currentTrack
     );
-    const nextTrack = ayatRangeToPlay[trackIndex + 1]?.track;
+    const nextTrack = tracksToPlay[trackIndex + 1]?.track;
 
     if (nextTrack) {
       audioPlayerRef.current[nextTrack].current.play();
@@ -84,7 +96,7 @@ const QuranApp = () => {
       return;
     }
     if (shouldRepeat) {
-      const firstTrack = ayatRangeToPlay[0].track;
+      const firstTrack = tracksToPlay[0].track;
       audioPlayerRef.current[firstTrack].current.play();
       setActiveTrack(firstTrack);
       return;
@@ -108,7 +120,7 @@ const QuranApp = () => {
 
   const handleReset = () => {
     handleStopAll();
-    const firstTrack: Track = ayatRangeToPlay[0].track;
+    const firstTrack: Track = tracksToPlay[0].track;
     setActiveTrack(firstTrack);
     handlePlay({ activeTrack: firstTrack });
   };
@@ -125,10 +137,10 @@ const QuranApp = () => {
   }, []);
 
   useEffect(() => {
-    if (!ayatRangeToPlay.length) return;
+    if (!tracksToPlay.length) return;
     handleStopAll();
-    setActiveTrack(ayatRangeToPlay[0].track);
-  }, [ayatRangeToPlay, handleStopAll]);
+    setActiveTrack(tracksToPlay[0].track);
+  }, [tracksToPlay, handleStopAll]);
 
   useEffect(() => {
     document.title = `${surah.number}:${currentAyat} : ${surah.name} - ${appName}`;
@@ -214,7 +226,7 @@ const QuranApp = () => {
         </div>
       </div>
       <div>
-        {ayatRangeToPlay.map(({ track }) => {
+        {tracksToPlay.map(({ track, trackUrl }) => {
           return (
             <audio
               key={track}
@@ -226,9 +238,9 @@ const QuranApp = () => {
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
             >
-              <source src={`${audioSrcBaseUrl}/${track}.${audioExtention}`} />
+              <source src={trackUrl} />
               <track
-                src={`${audioSrcBaseUrl}/${track}.${audioExtention}`}
+                src={trackUrl}
                 kind="captions"
                 srcLang="en"
                 label="English"

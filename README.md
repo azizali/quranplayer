@@ -4,15 +4,15 @@
 - [x] Tracks in title
 - [x] Design
 - [x] Design 2
-- [ ] Bug: Safari not working
-- [ ] Get sound file from mp3 source
-- [ ] Tick sound on repeat
+- [x] BUG: Safari not working
+- [x] Get sound file from mp3 source
+- [x] Tick sound on repeat
 - [x] Seeking error
 - [x] re-Start from start
 - [x] Save prefence in localstorage
 - [ ] Backup sound tracks from server
-- [ ] Bug: stops in the middle and cant restart again
-- [ ] Bug: When start and end track are same number, it does not play
+- [ ] BUG: stops in the middle and cant restart again
+- [ ] BUG: When start and end track are same number, it does not play
 - [ ] App as PWA + Explore Tinybase
 - [ ] Reciter Selection
 - [ ] Dark mode

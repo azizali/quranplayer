@@ -702,5 +702,3 @@ export function generateAllFileNames() {
 
   return links;
 }
-
-// console.log(generateAllFileNames());
