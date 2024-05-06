@@ -4951,7 +4951,14 @@ const route2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
 const assets = [
   "/click-sound.mp3",
   "/entry.worker.js",
-  "/favicon.ico"
+  "/favicon.ico",
+  "/manifest.json",
+  "/images/touch/homescreen144.png",
+  "/images/touch/homescreen192.png",
+  "/images/touch/homescreen48.png",
+  "/images/touch/homescreen512.png",
+  "/images/touch/homescreen72.png",
+  "/images/touch/homescreen96.png"
 ];
 const routes = {
   "root": {
