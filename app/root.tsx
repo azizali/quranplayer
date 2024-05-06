@@ -1,3 +1,4 @@
+import { useSWEffect } from "@remix-pwa/sw";
 import {
   Links,
   Meta,
@@ -10,6 +11,8 @@ import stylesheet from "~/tailwind.css?url";
 export const links = () => [{ rel: "stylesheet", href: stylesheet }];
 
 export default function App() {
+  useSWEffect();
+
   return (
     <html lang="en">
       <head>
