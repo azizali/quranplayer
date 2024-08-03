@@ -146,6 +146,11 @@ const QuranApp = () => {
     document.title = `${surah.number}:${currentAyat} : ${surah.name} - ${appName}`;
   }, [currentAyat, surah]);
 
+  useEffect(() => {
+    if (endingAyatNumber < startingAyatNumber)
+      setEndingAyatNumber(startingAyatNumber);
+  }, [startingAyatNumber, endingAyatNumber, setEndingAyatNumber]);
+
   return (
     <div className="flex rounded-lg border-2 mx-auto p-9 w-full max-w-md flex-col justify-center gap-3 bg-white">
       <div style={{ display: "flex", justifyContent: "center" }}>
