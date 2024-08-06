@@ -160,11 +160,11 @@ const QuranApp = () => {
   }, [startingAyatNumber, endingAyatNumber, setEndingAyatNumber]);
 
   return (
-    <div className="flex h-screen rounded-lg mx-auto w-full max-w-md flex-col bg-white justify-between">
+    <div className="flex h-screen overflow-y-hiddenx mx-auto w-full max-w-md flex-col bg-white">
       <div className="flex justify-center bg-primary text-white p-1">
-        <h1 className=" font-extralight text-2xl">{appName}</h1>
+        <h1 className="text-2xl">{appName}</h1>
       </div>
-      <div className="p-4 flex-grow flex gap-2 flex-col ">
+      <div className="p-4 flex-grow overflow-hidden flex gap-2 flex-col ">
         <div>
           <select
             className="border-2 rounded p-2 w-full"
@@ -230,7 +230,7 @@ const QuranApp = () => {
             </select>
           </div>
         </div>
-        <div className="flex-grow overflow-y-scroll">
+        <div className="overflow-y-scroll">
           {tracksToPlay.map(({ ayatNumber, track, trackUrl }) => {
             const isActiveTrack =
               activeTrack === track && track !== REPEAT_SOUND_TRACK;
