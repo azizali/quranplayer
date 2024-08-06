@@ -11,6 +11,7 @@ import { useLocalStorage } from "usehooks-ts";
 import { appName, surahs } from "~/components/config";
 import { Track } from "~/routes/types";
 
+const REPEAT_SOUND_TRACK = "REPEAT_SOUND_TRACK" as Track;
 const audioExtention = "mp3"; // 'opus' | 'mp3'
 const audioSrcBaseUrl = `https://everyayah.com/data/Alafasy_64kbps/`;
 // https://mirrors.quranicaudio.com/muqri/alafasi/opus
@@ -21,7 +22,6 @@ const QuranApp = () => {
   );
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [activeTrack, setActiveTrack] = useState<Track>("" as Track);
-
   const [surahNumber, setSurahNumber] = useLocalStorage<number>(
     "surahNumber",
     1
@@ -66,7 +66,6 @@ const QuranApp = () => {
     });
 
     if (shouldRepeat) {
-      const REPEAT_SOUND_TRACK = "REPEAT_SOUND_TRACK";
       trackObjects.push({
         surahNumber,
         ayatNumber,
@@ -88,7 +87,7 @@ const QuranApp = () => {
     const trackIndex = tracksToPlay.findIndex(
       ({ track }) => track === currentTrack
     );
-    const nextTrack = tracksToPlay[trackIndex + 1]?.track;
+    const nextTrack = tracksToPlay[trackIndex + 1]?.track as Track;
 
     if (nextTrack) {
       audioPlayerRef.current[nextTrack].current.play();
@@ -107,7 +106,7 @@ const QuranApp = () => {
   const handlePlay = ({ activeTrack }: { activeTrack: Track }) => {
     setIsPlaying(true);
     try {
-      audioPlayerRef.current[activeTrack].current?.play();
+      audioPlayerRef.current[activeTrack]?.current.play();
     } catch (e) {
       console.log(e);
     }
@@ -136,6 +135,15 @@ const QuranApp = () => {
     });
   }, []);
 
+  const handleAyatClick = useCallback(
+    (track: Track) => {
+      handleStopAll();
+      setActiveTrack(track);
+      handlePlay({ activeTrack: track });
+    },
+    [handleStopAll]
+  );
+
   useEffect(() => {
     if (!tracksToPlay.length) return;
     handleStopAll();
@@ -152,137 +160,144 @@ const QuranApp = () => {
   }, [startingAyatNumber, endingAyatNumber, setEndingAyatNumber]);
 
   return (
-    <div className="flex rounded-lg border-2 mx-auto p-9 w-full max-w-md flex-col justify-center gap-3 bg-white">
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <h1
-          style={{
-            fontSize: "1.5em",
-            margin: 0,
-            padding: 0,
-            fontWeight: "bold",
-          }}
-        >
-          {appName}
-        </h1>
+    <div className="flex h-screen rounded-lg mx-auto w-full max-w-md flex-col bg-white justify-between">
+      <div className="flex justify-center bg-primary text-white p-1">
+        <h1 className=" font-extralight text-2xl">{appName}</h1>
       </div>
-      <div>
-        <select
-          className="border-2 rounded p-2 w-full"
-          name="surah"
-          id="surah"
-          value={surahNumber}
-          size={1}
-          onChange={(e) => {
-            const surahNumber = parseInt(e.target.value);
-            setSurahNumber(surahNumber);
-            const surah = surahs[surahNumber - 1];
-            setStartingAyatNumber(1);
-            setEndingAyatNumber(surah.numberOfAyats);
-          }}
-        >
-          {surahs.map(({ number, name, nameEnglish }) => (
-            <option key={name} value={number}>
-              {number}. {name}: {nameEnglish}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="flex gap-2">
-        <div className="flex gap-2 items-center">
-          <label htmlFor="startAyat">Starting</label>
+      <div className="p-4 flex-grow flex gap-2 flex-col ">
+        <div>
           <select
-            className="border-2 rounded p-2"
-            name="startingAyatNumber"
-            id="startingAyatNumber"
-            value={startingAyatNumber}
+            className="border-2 rounded p-2 w-full"
+            name="surah"
+            id="surah"
+            value={surahNumber}
+            size={1}
             onChange={(e) => {
-              setStartingAyatNumber(parseInt(e.target.value));
+              const surahNumber = parseInt(e.target.value);
+              setSurahNumber(surahNumber);
+              const surah = surahs[surahNumber - 1];
+              setStartingAyatNumber(1);
+              setEndingAyatNumber(surah.numberOfAyats);
             }}
           >
-            {Array.from({ length: surah.numberOfAyats }).map((_, index) => (
-              <option key={index + 1} value={index + 1}>
-                {index + 1}
+            {surahs.map(({ number, name, nameEnglish }) => (
+              <option key={name} value={number}>
+                {number}. {name}: {nameEnglish}
               </option>
             ))}
           </select>
         </div>
-        <div className="flex gap-2 items-center">
-          <label htmlFor="startAyat">Ending</label>
-          <select
-            className="border-2 rounded p-2"
-            name="endingAyatNumber"
-            id="endingAyatNumber"
-            value={endingAyatNumber}
-            onChange={(e) => {
-              setEndingAyatNumber(parseInt(e.target.value));
-            }}
-          >
-            {Array.from({
-              length: surah.numberOfAyats - startingAyatNumber + 1,
-            }).map((_, index) => {
-              const ayatNumber = startingAyatNumber + index;
-              return (
-                <option key={ayatNumber} value={ayatNumber}>
-                  {ayatNumber}
+        <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <label htmlFor="startAyat">Starting</label>
+            <select
+              className="border-2 rounded p-2"
+              name="startingAyatNumber"
+              id="startingAyatNumber"
+              value={startingAyatNumber}
+              onChange={(e) => {
+                setStartingAyatNumber(parseInt(e.target.value));
+              }}
+            >
+              {Array.from({ length: surah.numberOfAyats }).map((_, index) => (
+                <option key={index + 1} value={index + 1}>
+                  {index + 1}
                 </option>
-              );
-            })}
-          </select>
+              ))}
+            </select>
+          </div>
+          <div className="flex gap-2 items-center">
+            <label htmlFor="startAyat">Ending</label>
+            <select
+              className="border-2 rounded p-2"
+              name="endingAyatNumber"
+              id="endingAyatNumber"
+              value={endingAyatNumber}
+              onChange={(e) => {
+                setEndingAyatNumber(parseInt(e.target.value));
+              }}
+            >
+              {Array.from({
+                length: surah.numberOfAyats - startingAyatNumber + 1,
+              }).map((_, index) => {
+                const ayatNumber = startingAyatNumber + index;
+                return (
+                  <option key={ayatNumber} value={ayatNumber}>
+                    {ayatNumber}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+        </div>
+        <div className="flex-grow overflow-y-scroll">
+          {tracksToPlay.map(({ ayatNumber, track, trackUrl }) => {
+            const isActiveTrack =
+              activeTrack === track && track !== REPEAT_SOUND_TRACK;
+            const isInactiveTrack =
+              activeTrack !== track && track !== REPEAT_SOUND_TRACK;
+            return (
+              <div
+                key={track}
+                className="block p-2 first:border-t border border-t-0 w-full even:bg-slate-100 last:hidden"
+              >
+                {isActiveTrack && (
+                  <div className="text-center">Current ayat #{currentAyat}</div>
+                )}
+                <audio
+                  key={track}
+                  id={track}
+                  ref={audioPlayerRef.current[track]}
+                  preload="true"
+                  controls={isActiveTrack}
+                  onEnded={handleEnded}
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
+                >
+                  <source src={trackUrl} />
+                  <track
+                    src={trackUrl}
+                    kind="captions"
+                    srcLang="en"
+                    label="English"
+                  />
+                </audio>
+                {isInactiveTrack && (
+                  <button
+                    className="w-full"
+                    onClick={() => handleAyatClick(track)}
+                  >
+                    Play ayat #{ayatNumber}
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div>
+          <label className="flex gap-2" htmlFor="shouldRepeat">
+            <input
+              type="checkbox"
+              name="shouldRepeat"
+              id="shouldRepeat"
+              checked={shouldRepeat}
+              onChange={() => setShouldRepeat(!shouldRepeat)}
+            />
+            Repeat
+          </label>
         </div>
       </div>
-      <div>
-        {tracksToPlay.map(({ track, trackUrl }) => {
-          return (
-            <audio
-              key={track}
-              id={track}
-              ref={audioPlayerRef.current[track]}
-              preload="true"
-              controls={activeTrack === track}
-              onEnded={handleEnded}
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
-            >
-              <source src={trackUrl} />
-              <track
-                src={trackUrl}
-                kind="captions"
-                srcLang="en"
-                label="English"
-              />
-            </audio>
-          );
-        })}
-      </div>
-      <div>
-        <label className="flex gap-2" htmlFor="shouldRepeat">
-          <input
-            type="checkbox"
-            name="shouldRepeat"
-            id="shouldRepeat"
-            checked={shouldRepeat}
-            onChange={() => setShouldRepeat(!shouldRepeat)}
-          />
-          Repeat
-        </label>
-      </div>
-      Current Ayat: {currentAyat}
-      <div className="flex gap-2">
+      <div className="inline-flex shadow-sm" role="group">
         {!isPlaying && (
           <button
-            className="btn"
-            style={{ width: "100%" }}
+            className="btn w-full"
             onClick={() => handlePlay({ activeTrack })}
           >
             Play
           </button>
         )}
         {isPlaying && (
-          <button
-            className="btn"
-            style={{ width: "100%" }}
-            onClick={handlePause}
-          >
+          <button className="btn w-full" onClick={handlePause}>
             Pause
           </button>
         )}
@@ -292,11 +307,6 @@ const QuranApp = () => {
           </button>
         )}
       </div>
-      {/* {generateAllFileNames().map((link) => (
-        <a key={link} href={link}>
-          {link}
-        </a>
-      ))} */}
     </div>
   );
 };
