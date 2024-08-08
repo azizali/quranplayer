@@ -9,7 +9,7 @@ framework = "vite"
 # Set immutable caching for static files, because they have fingerprinted filenames
 
 [[headers]]
-  for = "/build/*"
+  for = "/*"
   [headers.values]
     cache-control = '''
     max-age=0,
