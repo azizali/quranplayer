@@ -9,8 +9,10 @@ framework = "vite"
 # Set immutable caching for static files, because they have fingerprinted filenames
 
 [[headers]]
-for = "/build/*"
-
-[headers.values]
-
-"Cache-Control" = "public, max-age=604800, must-revalidate"
+  for = "/build/*"
+  [headers.values]
+    cache-control = '''
+    max-age=0,
+    no-cache,
+    no-store,
+    must-revalidate'''
