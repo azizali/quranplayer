@@ -82,6 +82,24 @@ const QuranApp = () => {
     return parseInt(activeTrack.split("").slice(3).join("")) | 0;
   }, [activeTrack]);
 
+  const playAyat = (ayatNumber: Track) => {
+    const audioRef = audioPlayerRef.current[ayatNumber]?.current;
+    audioRef.play();
+    setIsPlaying(true);
+
+    if (audioRef.parentElement.previousElementSibling) {
+      audioRef.parentElement.previousElementSibling.scrollIntoView();
+    } else {
+      audioRef.parentElement.scrollIntoView();
+    }
+  };
+
+  const pauseAyat = (ayatNumber: Track) => {
+    const audioRef = audioPlayerRef.current[ayatNumber]?.current;
+    audioRef.pause();
+    setIsPlaying(false);
+  };
+
   const handleEnded = (e) => {
     const currentTrack = e.target.id;
     const trackIndex = tracksToPlay.findIndex(
@@ -90,32 +108,28 @@ const QuranApp = () => {
     const nextTrack = tracksToPlay[trackIndex + 1]?.track as Track;
 
     if (nextTrack) {
-      audioPlayerRef.current[nextTrack].current.play();
       setActiveTrack(nextTrack);
+      playAyat(nextTrack);
       return;
     }
     if (shouldRepeat) {
       const firstTrack = tracksToPlay[0].track;
-      audioPlayerRef.current[firstTrack].current.play();
       setActiveTrack(firstTrack);
+      playAyat(firstTrack);
       return;
     }
     setIsPlaying(false);
   };
 
-  const handlePlay = ({ activeTrack }: { activeTrack: Track }) => {
-    setIsPlaying(true);
+  const handlePlay = useCallback(({ activeTrack }: { activeTrack: Track }) => {
     try {
-      audioPlayerRef.current[activeTrack]?.current.play();
+      playAyat(activeTrack);
     } catch (e) {
       console.log(e);
     }
-  };
+  }, []);
 
-  const handlePause = () => {
-    setIsPlaying(false);
-    audioPlayerRef.current[activeTrack].current.pause();
-  };
+  const handlePause = () => pauseAyat(activeTrack);
 
   const handleReset = () => {
     handleStopAll();
@@ -141,7 +155,7 @@ const QuranApp = () => {
       setActiveTrack(track);
       handlePlay({ activeTrack: track });
     },
-    [handleStopAll]
+    [handlePlay, handleStopAll]
   );
 
   useEffect(() => {
@@ -160,7 +174,7 @@ const QuranApp = () => {
   }, [startingAyatNumber, endingAyatNumber, setEndingAyatNumber]);
 
   return (
-    <div className="flex h-screen overflow-y-hiddenx mx-auto w-full max-w-md flex-col bg-white">
+    <div className="flex h-screen mx-auto w-full max-w-md flex-col bg-white">
       <div className="flex justify-center bg-primary text-white p-1">
         <h1 className="text-2xl">{appName}</h1>
       </div>
@@ -230,7 +244,7 @@ const QuranApp = () => {
             </select>
           </div>
         </div>
-        <div className="overflow-y-scroll">
+        <div className="overflow-y-scroll border scroll-smooth">
           {tracksToPlay.map(({ ayatNumber, track, trackUrl }) => {
             const isActiveTrack =
               activeTrack === track && track !== REPEAT_SOUND_TRACK;
@@ -239,7 +253,7 @@ const QuranApp = () => {
             return (
               <div
                 key={track}
-                className="block p-2 first:border-t border border-t-0 w-full even:bg-slate-100 last:hidden"
+                className="block p-2 border-y border-t-0 w-full even:bg-slate-100 last:hidden"
               >
                 {isActiveTrack && (
                   <div className="text-center">Current ayat #{currentAyat}</div>
@@ -274,7 +288,7 @@ const QuranApp = () => {
             );
           })}
         </div>
-        <div>
+        <div className="flex gap-3 justify-between">
           <label className="flex gap-2" htmlFor="shouldRepeat">
             <input
               type="checkbox"
@@ -285,6 +299,7 @@ const QuranApp = () => {
             />
             Repeat
           </label>
+          <div>Current ayat #{currentAyat}</div>
         </div>
       </div>
       <div className="inline-flex shadow-sm" role="group">
