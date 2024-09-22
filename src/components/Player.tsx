@@ -1,5 +1,5 @@
 import {
-  RefObject,
+  type RefObject,
   createRef,
   useCallback,
   useEffect,
@@ -8,8 +8,8 @@ import {
   useState,
 } from "react";
 import { useLocalStorage } from "usehooks-ts";
-import { appName, surahs } from "~/components/config";
-import { Track } from "~/routes/types";
+import { appName, surahs } from "../_main/config";
+import { type Track } from "../_main/types";
 
 const REPEAT_SOUND_TRACK = "REPEAT_SOUND_TRACK" as Track;
 const audioExtention = "mp3"; // 'opus' | 'mp3'
@@ -180,6 +180,7 @@ const QuranApp = () => {
       </div>
       <div className="p-4 flex-grow overflow-hidden flex gap-2 flex-col ">
         <div>
+          <label htmlFor="surah">Surah</label>
           <select
             className="border-2 rounded p-2 w-full"
             name="surah"
@@ -203,7 +204,7 @@ const QuranApp = () => {
         </div>
         <div className="flex gap-2">
           <div className="flex gap-2 items-center">
-            <label htmlFor="startAyat">Starting</label>
+            <label htmlFor="startingAyatNumber">Starting</label>
             <select
               className="border-2 rounded p-2"
               name="startingAyatNumber"
@@ -221,7 +222,7 @@ const QuranApp = () => {
             </select>
           </div>
           <div className="flex gap-2 items-center">
-            <label htmlFor="startAyat">Ending</label>
+            <label htmlFor="endingAyatNumber">Ending</label>
             <select
               className="border-2 rounded p-2"
               name="endingAyatNumber"
@@ -305,19 +306,25 @@ const QuranApp = () => {
       <div className="inline-flex shadow-sm" role="group">
         {!isPlaying && (
           <button
-            className="btn w-full"
+            className="btn bg-primary font-bold text-xl text-white w-full p-3"
             onClick={() => handlePlay({ activeTrack })}
           >
             Play
           </button>
         )}
         {isPlaying && (
-          <button className="btn w-full" onClick={handlePause}>
+          <button
+            className="btn bg-primary font-bold text-xl text-white w-full p-3"
+            onClick={handlePause}
+          >
             Pause
           </button>
         )}
         {currentAyat > startingAyatNumber && (
-          <button className="btn-secondary" onClick={handleReset}>
+          <button
+            className="btn bg-secondary font-bold text-xl text-white p-3"
+            onClick={handleReset}
+          >
             Restart
           </button>
         )}
