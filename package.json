@@ -23,5 +23,8 @@
     "typescript": "^5.6.2",
     "usehooks-ts": "^3.1.0",
     "vite-plugin-pwa": "^0.20.5"
+  },
+  "devDependencies": {
+    "@vite-pwa/astro": "^0.4.3"
   }
 }
