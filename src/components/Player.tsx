@@ -1,5 +1,6 @@
 import {
   type RefObject,
+  type SyntheticEvent,
   createRef,
   useCallback,
   useEffect,
@@ -83,25 +84,29 @@ const QuranApp = () => {
   }, [activeTrack]);
 
   const playAyat = (ayatNumber: Track) => {
-    const audioRef = audioPlayerRef.current[ayatNumber]?.current;
+    const audioRef = audioPlayerRef.current[ayatNumber]
+      .current as HTMLAudioElement;
     audioRef.play();
     setIsPlaying(true);
 
-    if (audioRef.parentElement.previousElementSibling) {
-      audioRef.parentElement.previousElementSibling.scrollIntoView();
+    const parentElement = audioRef.parentElement as Element;
+    if (parentElement.previousElementSibling) {
+      parentElement.previousElementSibling.scrollIntoView();
     } else {
-      audioRef.parentElement.scrollIntoView();
+      parentElement.scrollIntoView();
     }
   };
 
   const pauseAyat = (ayatNumber: Track) => {
-    const audioRef = audioPlayerRef.current[ayatNumber]?.current;
+    const audioRef = audioPlayerRef.current[ayatNumber]
+      .current as HTMLAudioElement;
     audioRef.pause();
     setIsPlaying(false);
   };
 
-  const handleEnded = (e) => {
-    const currentTrack = e.target.id;
+  const handleEnded = (e: SyntheticEvent) => {
+    console.log(e);
+    const currentTrack = (e.target as HTMLElement).id;
     const trackIndex = tracksToPlay.findIndex(
       ({ track }) => track === currentTrack
     );
@@ -140,7 +145,7 @@ const QuranApp = () => {
 
   const handleStopAll = useCallback(() => {
     setIsPlaying(false);
-    const tracks = Object.keys(audioPlayerRef.current);
+    const tracks = Object.keys(audioPlayerRef.current) as Array<Track>;
     tracks.forEach((track) => {
       const elm = audioPlayerRef.current[track]?.current;
       if (!elm) return;
