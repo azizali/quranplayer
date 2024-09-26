@@ -35,8 +35,41 @@ export default defineConfig({
         ],
       },
       workbox: {
-        navigateFallback: "/",
-        globPatterns: ["**/*.{css,js,html,svg,png,ico,txt}"],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/everyayah.com\/.*$/,
+            handler: "NetworkFirst", // Uses network but falls back to cache if offline
+            options: {
+              cacheName: "audio-cache",
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
+              },
+            },
+          },
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif)$/,
+            handler: "CacheFirst", // Serves from cache first
+            options: {
+              cacheName: "image-cache",
+              expiration: {
+                maxEntries: 60,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
+              },
+            },
+          },
+          {
+            urlPattern: /\.(?:js|css)$/,
+            handler: "StaleWhileRevalidate", // Uses cached files while fetching updates
+            options: {
+              cacheName: "asset-cache",
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+              },
+            },
+          },
+        ],
       },
       devOptions: {
         enabled: true,
