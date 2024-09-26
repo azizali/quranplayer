@@ -2,9 +2,9 @@
 
 ## Todo
 
-- [ ] Cache previously loaded Surahs
-- [ ] Show icons on what is downloaded/cached
-- [ ] Update web app when it updates
+- [x] Cache previously loaded Surahs
+- [x] Update web app when it updates
+- [x] Show icons on what is downloaded/cached
 
 ## 🧞 Commands
 

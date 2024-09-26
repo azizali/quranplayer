@@ -10,7 +10,8 @@ import {
 } from "react";
 import { useLocalStorage } from "usehooks-ts";
 import { appName, surahs } from "../_main/config";
-import { type Track } from "../_main/types";
+import { type Track, type TrackObject } from "../_main/types";
+import { useCachedAssets } from "./useCachedAssets";
 
 const REPEAT_SOUND_TRACK = "REPEAT_SOUND_TRACK" as Track;
 const audioExtention = "mp3"; // 'opus' | 'mp3'
@@ -39,6 +40,7 @@ const QuranApp = () => {
     "shouldRepeat",
     true
   );
+  const cachedAudio = useCachedAssets("audio-cache", [activeTrack]);
 
   const surah = useMemo(() => {
     return surahs[surahNumber - 1];
@@ -47,7 +49,7 @@ const QuranApp = () => {
   const tracksToPlay = useMemo(() => {
     let ayatNumber = startingAyatNumber - 1;
 
-    const trackObjects = Array.from({
+    const trackObjects: TrackObject[] = Array.from({
       length: endingAyatNumber - ayatNumber,
     }).map(() => {
       ayatNumber++;
@@ -252,6 +254,7 @@ const QuranApp = () => {
         </div>
         <div className="overflow-y-scroll border scroll-smooth">
           {tracksToPlay.map(({ ayatNumber, track, trackUrl }) => {
+            const isCachedTrack = cachedAudio[trackUrl];
             const isActiveTrack =
               activeTrack === track && track !== REPEAT_SOUND_TRACK;
             const isInactiveTrack =
@@ -261,9 +264,25 @@ const QuranApp = () => {
                 key={track}
                 className="block p-2 border-y border-t-0 w-full even:bg-slate-100 last:hidden"
               >
-                {isActiveTrack && (
-                  <div className="text-center">Current ayat #{currentAyat}</div>
-                )}
+                <div className="flex">
+                  {isActiveTrack && (
+                    <div className="w-full flex items-center gap-2">
+                      Current Ayat #{currentAyat}
+                    </div>
+                  )}
+                  {isInactiveTrack && (
+                    <button
+                      className="w-full flex items-center gap-2"
+                      onClick={() => handleAyatClick(track)}
+                    >
+                      <img src="./play-icon.svg" />
+                      Play Ayat #{ayatNumber}
+                    </button>
+                  )}
+                  {isCachedTrack && (
+                    <img src="./save-icon.svg" width={16} height={16} />
+                  )}
+                </div>
                 <audio
                   key={track}
                   id={track}
@@ -282,14 +301,6 @@ const QuranApp = () => {
                     label="English"
                   />
                 </audio>
-                {isInactiveTrack && (
-                  <button
-                    className="w-full"
-                    onClick={() => handleAyatClick(track)}
-                  >
-                    Play ayat #{ayatNumber}
-                  </button>
-                )}
               </div>
             );
           })}
