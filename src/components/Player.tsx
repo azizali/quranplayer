@@ -40,7 +40,6 @@ const QuranApp = () => {
     "shouldRepeat",
     true
   );
-  const cachedAudio = useCachedAssets("audio-cache", [activeTrack]);
 
   const surah = useMemo(() => {
     return surahs[surahNumber - 1];
@@ -81,9 +80,14 @@ const QuranApp = () => {
     return trackObjects;
   }, [startingAyatNumber, endingAyatNumber, shouldRepeat, surahNumber]);
 
-  const currentAyat = useMemo(() => {
+  const activeAyatNumber = useMemo(() => {
     return parseInt(activeTrack.split("").slice(3).join("")) | 0;
   }, [activeTrack]);
+
+  const cachedAudio = useCachedAssets("audio-cache", [
+    activeAyatNumber,
+    isPlaying,
+  ]);
 
   const playAyat = (ayatNumber: Track) => {
     const audioRef = audioPlayerRef.current[ayatNumber]
@@ -172,8 +176,8 @@ const QuranApp = () => {
   }, [tracksToPlay, handleStopAll]);
 
   useEffect(() => {
-    document.title = `${surah.number}:${currentAyat} : ${surah.name} - ${appName}`;
-  }, [currentAyat, surah]);
+    document.title = `${surah.number}:${activeAyatNumber} : ${surah.name} - ${appName}`;
+  }, [activeAyatNumber, surah]);
 
   useEffect(() => {
     if (endingAyatNumber < startingAyatNumber)
@@ -267,7 +271,7 @@ const QuranApp = () => {
                 <div className="flex">
                   {isActiveTrack && (
                     <div className="w-full flex items-center gap-2">
-                      Current Ayat #{currentAyat}
+                      Current Ayat #{activeAyatNumber}
                     </div>
                   )}
                   {isInactiveTrack && (
@@ -316,7 +320,7 @@ const QuranApp = () => {
             />
             Repeat
           </label>
-          <div>Current ayat #{currentAyat}</div>
+          <div>Current ayat #{activeAyatNumber}</div>
         </div>
       </div>
       <div className="inline-flex shadow-sm" role="group">
@@ -336,7 +340,7 @@ const QuranApp = () => {
             Pause
           </button>
         )}
-        {currentAyat > startingAyatNumber && (
+        {activeAyatNumber > startingAyatNumber && (
           <button
             className="btn bg-secondary font-bold text-xl text-white p-3"
             onClick={handleReset}
