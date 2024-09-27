@@ -38,7 +38,7 @@ export default defineConfig({
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/everyayah.com\/.*$/,
-            handler: "NetworkFirst", // Uses network but falls back to cache if offline
+            handler: "CacheFirst", // Uses network but falls back to cache if offline
             options: {
               cacheName: "audio-cache",
               expiration: {

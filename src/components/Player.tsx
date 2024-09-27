@@ -63,7 +63,7 @@ const QuranApp = () => {
         surahNumber,
         ayatNumber,
         track,
-        trackUrl: `${audioSrcBaseUrl}/${track}.${audioExtention}`,
+        trackUrl: `${audioSrcBaseUrl}${track}.${audioExtention}`,
       };
     });
 
