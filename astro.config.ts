@@ -42,7 +42,6 @@ export default defineConfig({
             options: {
               cacheName: "audio-cache",
               expiration: {
-                maxEntries: 50,
                 maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
               },
             },
