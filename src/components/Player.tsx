@@ -11,6 +11,8 @@ import {
 import { useLocalStorage } from "usehooks-ts";
 import { appName, surahs } from "../_main/config";
 import { type Track, type TrackObject } from "../_main/types";
+import PlayIcon from "./icons/PlayIcon";
+import SaveIcon from "./icons/SaveIcon";
 import { useCachedAssets } from "./useCachedAssets";
 
 const REPEAT_SOUND_TRACK = "REPEAT_SOUND_TRACK" as Track;
@@ -111,7 +113,6 @@ const QuranApp = () => {
   };
 
   const handleEnded = (e: SyntheticEvent) => {
-    console.log(e);
     const currentTrack = (e.target as HTMLElement).id;
     const trackIndex = tracksToPlay.findIndex(
       ({ track }) => track === currentTrack
@@ -279,13 +280,11 @@ const QuranApp = () => {
                       className="w-full flex items-center gap-2"
                       onClick={() => handleAyatClick(track)}
                     >
-                      <img src="./play-icon.svg" />
+                      <PlayIcon />
                       Play Ayat #{ayatNumber}
                     </button>
                   )}
-                  {isCachedTrack && (
-                    <img src="./save-icon.svg" width={16} height={16} />
-                  )}
+                  {isCachedTrack && <SaveIcon />}
                 </div>
                 <audio
                   key={track}
